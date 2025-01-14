@@ -39,11 +39,30 @@ class ProjectInput {
         this.attach();
     }
 
+    private gatherUserInput(): [string, string, number] | void {
+        const inputTitle = this.titleInputElement.value;
+        const inputDescription = this.descriptionInputElement.value;
+        const inputPeople = this.peopleInputElement.value;
+
+        // Initial Validation, will improve
+        if (inputTitle.trim().length === 0 || inputDescription.trim().length === 0 || inputPeople.trim().length === 0) {
+            alert('Invalid input, please try again');
+            return;
+        } else {
+            return [inputTitle, inputDescription, +inputPeople];
+        }
+    }
+
     // Handes Form Submissions
     @autobind
     private submitHandler(event: Event) {
         event.preventDefault();
-        console.log(this.titleInputElement.value);
+        const userInput = this.gatherUserInput();
+        if (Array.isArray(userInput)) {
+            const [title, desc, people] = userInput;
+            console.log(title, desc, people);
+            
+        }
 
     }
 
