@@ -1,3 +1,34 @@
+// Validation Logic
+interface Validatable {
+    value: string | number;
+    required?: boolean;
+    minLength?: number;
+    maxLength?: number;
+    min?: number;
+    max?: number;
+}
+
+function validate(validatableInput: Validatable) {
+    let isValid = true;
+    if (validatableInput.required ) {
+        isValid = isValid && validatableInput.value.toString().trim().length !== 0;
+    }
+    if (validatableInput.minLength != null && typeof validatableInput.value === 'string') {
+        isValid = isValid && validatableInput.value.length >= validatableInput.minLength;
+    }
+    if (validatableInput.maxLength && typeof validatableInput.value === 'string') {
+        isValid = isValid && validatableInput.value.length <= validatableInput.maxLength;
+    }
+    if (validatableInput.min != null && typeof validatableInput.value === 'number') {
+        isValid = isValid && validatableInput.value >= validatableInput.min;
+    }
+    if (validatableInput.max != null && typeof validatableInput.value === 'number') {
+        isValid = isValid && validatableInput.value <= validatableInput.max;
+    }
+
+    return isValid;
+}
+
 // Autobind Decorator
 function autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
@@ -11,7 +42,7 @@ function autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
     return adjDescriptor;
 }
 
-// Prohejc Input Class
+// Project Input Class
 class ProjectInput {
 
     templateELement: HTMLTemplateElement;
@@ -44,8 +75,30 @@ class ProjectInput {
         const inputDescription = this.descriptionInputElement.value;
         const inputPeople = this.peopleInputElement.value;
 
+        const titleValidatable: Validatable = {
+            value: inputTitle,
+            required: true
+        };
+
+        const descriptionValidatable: Validatable = {
+            value: inputDescription,
+            required: true,
+            minLength: 5
+        };
+
+        const peopleValidatable: Validatable = {
+            value: +inputPeople,
+            required: true,
+            min: 1,
+            max: 5
+        };
+
         // Initial Validation, will improve
-        if (inputTitle.trim().length === 0 || inputDescription.trim().length === 0 || inputPeople.trim().length === 0) {
+        if (
+            !validate(titleValidatable) ||
+            !validate(descriptionValidatable) ||
+            !validate(peopleValidatable)
+        ) {
             alert('Invalid input, please try again');
             return;
         } else {
