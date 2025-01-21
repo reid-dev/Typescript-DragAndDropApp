@@ -16,7 +16,7 @@ class ProjectState {
     private projects: Project[] = [];
     private static instance: ProjectState;
 
-    private constructor() {}
+    private constructor() { }
     static getInstance() {
         if (this.instance) {
             return this.instance;
@@ -53,7 +53,7 @@ interface Validatable {
 
 function validate(validatableInput: Validatable) {
     let isValid = true;
-    if (validatableInput.required ) {
+    if (validatableInput.required) {
         isValid = isValid && validatableInput.value.toString().trim().length !== 0;
     }
     if (validatableInput.minLength != null && typeof validatableInput.value === 'string') {
@@ -87,11 +87,11 @@ function autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
 
 // Project List Class
 class ProjectList {
-    
+
     templateELement: HTMLTemplateElement;
     hostElement: HTMLDivElement;
     element: HTMLElement;
-    assignedProjects: Project[] = []; 
+    assignedProjects: Project[] = [];
 
     constructor(private type: 'active' | 'finished') {
         this.templateELement = document.getElementById('project-list')! as HTMLTemplateElement;
@@ -102,9 +102,16 @@ class ProjectList {
         this.element.id = `${this.type}-projects`;
 
         projectState.addListener((projects: Project[]) => {
-            this.assignedProjects = projects;
+            const relevantProjects = projects.filter(proj => {
+                if (this.type === 'active') {
+                    return proj.status === ProjectStatus.Active;
+                }
+                return proj.status === ProjectStatus.Finished;
+            }
+            );
+            this.assignedProjects = relevantProjects;
             this.renderProjects();
-   
+
         });
 
         this.attach();
